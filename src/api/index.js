@@ -3,13 +3,10 @@
  */
 import axios from "axios";
 const qs = require('qs');
-import {bus} from "../bus.js";
-import router from '../router'
-import {MessageBox} from 'element-ui'
 axios.defaults.withCredentials = true;
 // axios.defaults.headers.common['Authorization'] = AUTH_TOKEN;
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8';//配置请求头
-var alertFlag = false // 控制短时间内 多个请求返回‘没有找到该报告’报错信息只弹一次alert框
+
 
 //添加一个请求拦截器
 // axios.interceptors.request.use(function (config) {
@@ -30,7 +27,6 @@ axios.interceptors.response.use(function (response) {
     if (response.data && response.data.errcode) {
         if (parseInt(response.data.errcode) === 40001) {
             //未登录
-            bus.$emit('goto', '/login')
         }
     }
     return response;
@@ -38,41 +34,9 @@ axios.interceptors.response.use(function (response) {
     // Do something with response error
     if (error.response) {
         if (error.response.status === 401) {
-            bus.$message.error('登录失效，请重新登录！');
-            bus.$emit('goto', '/login');
             location.reload(true);
             return;
         } else {
-            if (!alertFlag) {
-                alertFlag = true
-                if (error.response.data.message === '该报告已经删除!') {
-                    MessageBox.alert('该报告已删除', '警告', {
-                        confirmButtonText: '确定',
-                        type:'warning',
-                        showClose: false,
-                        closeOnPressEscape: false,
-                        closeOnClickModal: false,
-                        callback: action => {
-                            setTimeout(() => {
-                                alertFlag = false
-                            }, 1000/60)
-                            router.go(-1);
-                        }
-                    })
-                }
-            }
-            if (error.response.data) {
-                let hideMessage = false;
-                bus.$off('hideErrorMessage');
-                bus.$on('hideErrorMessage', (hideMessageState) => {
-                    hideMessage = hideMessageState;
-                });
-                setTimeout(() => {
-                    if (!hideMessage) {
-                        bus.$message.error(error.response.data.message || '加载出错');
-                    }
-                }, 0);
-            }
             return Promise.reject(error);
         }
     }
@@ -95,8 +59,8 @@ export const POST = (url, params) => {
 
 export const GET = (url, params) => {
     return axios.get(`${base}${url}`, {params: params, paramsSerializer: params => {
-        return qs.stringify(params, { indices: false })
-    }}).then(res => res.data)
+            return qs.stringify(params, { indices: false })
+        }}).then(res => res.data)
 };
 
 export const PUT = (url, params) => {

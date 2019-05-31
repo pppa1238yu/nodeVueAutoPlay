@@ -3,13 +3,7 @@ module.exports = {
     // 将baseUrl: '/api',改为baseUrl: '/',
     baseUrl: './',
     devServer: {
-        // proxy: 'http://ecg2.landmind.cn'
-        // proxy: 'http://192.168.1.122:9999'
-        // proxy: 'http://192.168.1.165:9999'
-        // proxy: 'http://192.168.1.156:9999' // 敬飞
-        // proxy: 'http://192.168.1.164:9999' // 徐驰
-        // proxy: 'http://ecg-java.landmind.cn'
-        proxy: 'http://ecg-java-release.landmind.cn'
+        proxy: 'http://192.168.1.157:8082'
     },
     configureWebpack: {
         output: {
